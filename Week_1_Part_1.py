@@ -6,17 +6,17 @@
 
 def check_bmi(height, weight):
 
-    bmi = weight / (height*height);
+    bmi = weight / (height * height);
 
-    if bmi>=18.5 and bmi<=25:
+    if bmi >= 18.5 and bmi <= 24:
         return True;
     else:
         return False;
 
 
-print(check_bmi(1.6, 60))   # print True
-print(check_bmi(1.6, 40))   # print False
-print(check_bmi(1.6, 100))  # print False
+print(check_bmi(1.6, 60));   # print True
+print(check_bmi(1.6, 40));   # print False
+print(check_bmi(1.6, 100));  # print False
 
 
 
@@ -27,11 +27,11 @@ print(check_bmi(1.6, 100))  # print False
 ##Write a Python script to calculate how many years it takes for your salary to double?
 
 salary = 25000;
-count=0;
+count = 0;
 
-while salary<=50000:
-    salary*=1.03;
-    count+=1;
+while salary <= 50000:
+    salary *= 1.03;
+    count += 1;
 
 print (count);
 
@@ -62,7 +62,7 @@ def binary_search_position(data, key):
             upper = mid - 1;
         else:
             #data[mid] = key
-            return ("Index：" + str(mid));
+            return ("Index: " + str(mid));
 
     return ("找不到數值");
 
@@ -78,9 +78,9 @@ print(binary_search_position([1, 2, 5, 6, 7], 6));
 def draw_pyramid(number): 
     for i in range(number):
         for j in range(number - i -1):
-            print(" ", end="");
-        for k in range((2*i)+1):
-            print("*", end="");
+            print(" ", end = "");
+        for k in range((2 * i) + 1):
+            print("*", end = "");
         print();
 
 
