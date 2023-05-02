@@ -17,15 +17,15 @@ class DbSetting():
         "charset": "utf8"
     }
 
-db_settings = DbSetting()
-
 import pymysql
-class InsertModle(DbSetting):
+from pymysql.cursors import DictCursor
+
+class InsertModel(DbSetting):
 
     def insert_user(self, email, password):
         try:
             # 建立Connection物件
-            conn = pymysql.connect(**db_settings.db_info)
+            conn = pymysql.connect(**self.db_info)
             
             # 建立Cursor物件
             with conn.cursor() as cursor:
@@ -47,11 +47,11 @@ class InsertModle(DbSetting):
         except Exception as ex:
             print(ex)
 
-class SelectModle(DbSetting):
+class SelectModel(DbSetting):
 
     def select_all_user(self):
         try:
-            conn = pymysql.connect(**db_settings.db_info)
+            conn = pymysql.connect(**self.db_info)
 
             with conn.cursor() as cursor:
                          
@@ -69,7 +69,7 @@ class SelectModle(DbSetting):
 
     def select_user_id_by_email(self, email):
         try:
-            conn = pymysql.connect(**db_settings.db_info)
+            conn = pymysql.connect(**self.db_info)
 
             with conn.cursor() as cursor:
                          
@@ -81,7 +81,7 @@ class SelectModle(DbSetting):
                 else:
                     #取得所有資料
                     result = cursor.fetchall()
-                    print(result)
+                    return result
                 
                 conn.commit()
                 conn.close()                
@@ -89,13 +89,13 @@ class SelectModle(DbSetting):
         except Exception as ex:
             print(ex)
 
-    def select_user_id_by_id(self, id):
+    def select_user_email_by_id(self, id):
         try:
-            conn = pymysql.connect(**db_settings.db_info)
+            conn = pymysql.connect(**self.db_info)
 
             with conn.cursor() as cursor:
                          
-                command = "SELECT * FROM user WHERE email='" + str(id) + "';"       
+                command = "SELECT * FROM user WHERE id='" + str(id) + "';"       
                 i = cursor.execute(command)      
                 
                 if i <= 0:
@@ -111,14 +111,14 @@ class SelectModle(DbSetting):
         except Exception as ex:
             print(ex)
 
-class UpdateModle(DbSetting):
+class UpdateModel(DbSetting):
     def update_user_password_by_email(self, email, old_password, new_password):
 
         if new_password == old_password:
             print("old and new passwords are the same, password nochange")
         else:   
             try:
-                conn = pymysql.connect(**db_settings.db_info)
+                conn = pymysql.connect(**self.db_info)
 
                 with conn.cursor() as cursor:
 
@@ -147,7 +147,7 @@ class UpdateModle(DbSetting):
 class DeleteModel(DbSetting):
     def delete_user_by_id(self, id):
         try:
-            conn = pymysql.connect(**db_settings.db_info)
+            conn = pymysql.connect(**self.db_info)
             
             with conn.cursor() as cursor:
                
@@ -159,8 +159,8 @@ class DeleteModel(DbSetting):
                 
                 else:
                     print(f'id = {id} is deleted')
-                    check_id = SelectModle()
-                    check_id.select_user_id_by_id(id)
+                    check_id = SelectModel()
+                    check_id.select_user_email_by_id(id)
 
                 conn.commit()
                 conn.close()          
@@ -169,19 +169,19 @@ class DeleteModel(DbSetting):
             print(ex)       
 
 
-ins = InsertModle()
-ins.insert_user('jack_11', 'password')
+# ins = InsertModel()
+# ins.insert_user('jack_11', 'password')
 
-select = SelectModle()
-select.select_all_user()
-select.select_user_id_by_email("jac77k_01@twm.com")
-select.select_user_id_by_id(2)
+# select = SelectModel()
+# select.select_all_user()
+# select.select_user_id_by_email("jac77k_01@twm.com")
+# select.select_user_email_by_id(7)
 
-update = UpdateModle()
-update.update_user_password_by_email('jack_01@twm.com', 'a123456', 'a123457')
+# update = UpdateModel()
+# update.update_user_password_by_email('jack_01@twm.com', 'a123456', 'a123457')
 
-delete = DeleteModel()
-delete.delete_user_by_id(6)
+# delete = DeleteModel()
+# delete.delete_user_by_id(6)
 
 
 # Assignment 2: SQL Statement Practice
@@ -199,9 +199,9 @@ delete.delete_user_by_id(6)
 class SelectModel2(DbSetting):
    def studen_sql_lab(self):
         try:
-            conn = pymysql.connect(**db_settings.db_info)
+            conn = pymysql.connect(**self.db_info)
 
-            with conn.cursor() as cursor:
+            with conn.cursor(cursor=DictCursor) as cursor:
 
                 #List out the score record of Chinese course for all students.                         
                 command = "SELECT name, score FROM studentscore WHERE course='Chinese';"       
@@ -210,8 +210,8 @@ class SelectModel2(DbSetting):
                 data = list(result) 
                 print('List out the score record of Chinese course for all students.')
                 for item in data:
-                    name = item[0]
-                    score = item[1]
+                    name = item['name']
+                    score = item['score']
                     print(f"{name}: {score}")   
 
                 # List out the score record of English course for all students in descending order.
@@ -221,8 +221,8 @@ class SelectModel2(DbSetting):
                 data = list(result) 
                 print('List out the score record of English course for all students in descending order.')
                 for item in data:
-                    name = item[0]
-                    score = item[1]
+                    name = item['name']
+                    score = item['score']
                     print(f"{name}: {score}")   
                 
                 # List out all the student name.
@@ -231,50 +231,51 @@ class SelectModel2(DbSetting):
                 result = cursor.fetchall()
                 print('List out all the student name.')
                 
-                for (name,) in result:
-                    print(name)
+                for item in data:
+                    name = item["name"]
+                    print(f'name: {name}') 
 
                 # Get the average score of Chinese course.
-                command = "SELECT AVG(score) AS avg_chinese FROM studentscore WHERE  course = 'Chinese';"
+                command = "SELECT AVG(score) AS avg_chinese FROM studentscore WHERE course = 'Chinese';"
                 cursor.execute(command)      
                 result = cursor.fetchall() #輸出chinese avg is: ((Decimal('62.8750'),),)，觀察後取[0][0]
                 print('Get the average score of Chinese course.')
-                print(f'chinese avg is: {result[0][0]}')
+                for r in result:
+                    print(f'chinese avg is: {r["avg_chinese"]}')
 
                 # Get the minimum score of English course.
-                command = "SELECT MIN(score) AS min_english FROM studentscore WHERE  course = 'English';"
+                command = "SELECT MIN(score) AS min_english FROM studentscore WHERE course = 'English';"
                 cursor.execute(command)      
                 result = cursor.fetchall() 
                 print('Get the minimum score of English course.')
-                print(f'minimum: {result[0][0]}')
+                for r in result:
+                    print (f'minimum: {r["min_english"]}')
 
                 # Get the maximum score of Maths course.
-                command = "SELECT MAX(score) AS min_english FROM studentscore WHERE  course = 'Maths';"
+                command = "SELECT MAX(score) AS max_english FROM studentscore WHERE course = 'Maths';"
                 cursor.execute(command)      
                 result = cursor.fetchall() 
                 print('Get the maximum score of Maths course.')
-                print(f'maximum: {result[0][0]}')
-
+                for r in result:
+                    print (f'maximum: {r["max_english"]}')
+               
                 # Get the number of student whose English score higher or equal to 60.
-                command = "SELECT COUNT(1) FROM studentscore WHERE course = 'English' AND score >= 60;"
+                command = "SELECT COUNT(1) AS count FROM studentscore WHERE course = 'English' AND score >= 60;"
                 cursor.execute(command)      
                 result = cursor.fetchall() 
                 print('Get the number of student whose English score higher or equal to 60.')
-                print(f'count: {result[0][0]}')
+                for r in result:
+                    print (f'number: {r["count"]}')
 
                 # List out the score records for male student whose surname are '周'
                 command = "SELECT * FROM studentscore WHERE NAME LIKE '周%' AND sex = '男';"
                 cursor.execute(command)      
                 result = cursor.fetchall() 
-                data = list(result) 
+                #data = list(result) 
                 print("List out the score records for male student whose surname are '周'")
-                for item in data:
-                    name = item[1]
-                    birth = item[2]
-                    sex = item[3]
-                    course = item[4]
-                    score = item[5]
-                    print(f"{name} - {birth} -  {sex} - {course} - {score}")  
+                for r in result:
+                    print(f'{r["name"]} - {r["birth"]} - {r["sex"]} - {r["course"]} - {r["score"]}')  
+          
                 
                 conn.commit()
                 conn.close()  
@@ -305,7 +306,7 @@ select2.studen_sql_lab()
 class JoinLab(DbSetting):
      def total_order_amount(self):
         
-        conn = pymysql.connect(**db_settings.db_info)
+        conn = pymysql.connect(**self.db_info)
 
         with conn.cursor() as cursor:
             
