@@ -21,22 +21,27 @@ import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 def selnium_lab():
+   
+
     # Open the Chrome browser.
     driver = webdriver.Chrome()
-    time.sleep(2)
-
+ 
     # Maximize the browser window.
     driver.maximize_window()
 
     # Navigate to AppWorks School Website (https://school.appworks.tw).
     driver.get("https://school.appworks.tw")
-    time.sleep(2)
+ 
+    wait = WebDriverWait(driver, 10)
 
     # Print “PASS” if the title of the page matches with “Code Your Future” else “FAIL”.
-    xpath = '//*[@id="page"]/div[1]/div/div[1]/div/div/div/h1/span'
-    str = driver.find_element(By.XPATH, xpath).text
+    xpath = '//h1[@class="hero-title "]/span'
+    str = wait.until(EC.presence_of_element_located((By.XPATH, xpath))).text
 
     if str == 'Code Your Future':
         print('PASS')
@@ -44,20 +49,18 @@ def selnium_lab():
         print('FAIL')
 
     # Click the link “AppWorks” in top right corner
-    xpath = '//*[@id="page-top"]/div[2]/div/div/div[2]/a/i'
-    driver.find_element(By.XPATH, xpath).click()
-    time.sleep(2)
-
+    xpath = '//div[@id="page-top"]/descendant::i'
+    wait.until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
+  
     # Switch to new tabs to AppWorks website
     xpath = 'AppWorks'
-    driver.find_element(By.LINK_TEXT, xpath).click()
+    wait.until(EC.element_to_be_clickable((By.LINK_TEXT, xpath))).click()
     driver.switch_to.window(driver.window_handles[1])
-    time.sleep(2)
-
+   
     # Print “PASS” if there is text “By Founders, For Founders” else “FAIL”.
-    xpath = '//*[@id="main"]/div[1]/div[2]/div/div/div[3]/div/h3/span/em'
-    str = driver.find_element(By.XPATH, xpath).text
-
+    xpath = '//div[@class="wpb_wrapper"]/descendant::span'
+    str = wait.until(EC.presence_of_element_located((By.XPATH, xpath))).text
+    
     if str == 'By Founders, For Founders':
         print('PASS')
     else:
@@ -65,12 +68,11 @@ def selnium_lab():
 
     # Navigate to https://appworks.tw/investments/
     driver.get("https://appworks.tw/investments/")
-    time.sleep(2)
 
     # Print “PASS” if there is text “We know you have a choice. We want you to choose us.” else “FAIL”.
-    xpath = '//*[@id="main"]/div[1]/div[2]/div/div/div[3]/div/h3/span/em'
+    xpath = '//div[@class="wpb_wrapper"]/descendant::span'
     str = driver.find_element(By.XPATH, xpath).text
-
+ 
     if str == 'We know you have a choice. We want you to choose us.':
         print('PASS')
     else:
@@ -78,7 +80,6 @@ def selnium_lab():
 
     # Navigate back to the AppWorks Website
     driver.back()
-    time.sleep(2)
 
     # Print the URL of the current page.
     current_url = driver.current_url
@@ -86,19 +87,16 @@ def selnium_lab():
 
     # Navigate forward. 回下一頁
     driver.forward()
-    time.sleep(2)
-
+ 
     # Close the current window
     driver.close()
-    time.sleep(2)
 
     # Switch back to the original window and reload the page.
     driver.switch_to.window(driver.window_handles[0])
     driver.refresh()
-    time.sleep(2)
 
     # Finally, Close the Browser.
-    driver.quit()
+    # driver.quit()
 
 sel = selnium_lab()
 

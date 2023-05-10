@@ -6,31 +6,41 @@ s = service.seleniumService.selectService()
 # Open the Chrome browser
 # Go to Demo Store (http://demostore.supersqa.com)
 url = 'http://demostore.supersqa.com'
-s.open_browser(url, By.ID, 'colophon')
+s.open_browser(url)
 
 # # Add “Album” to cart and view cart
-value = '//div[@id="primary"]/main/ul/li[3]/a[2]'
+value = '//h2[text()="Album"]/ancestor::li/a[text()="Add to cart"]'
 s.find_element(By.XPATH, value).click()
 
-value = '//div[@id="primary"]/main/ul/li[3]/a[3]'
+value = '//h2[text()="Album"]/ancestor::li/a[@title="View cart"]'
 s.find_element(By.XPATH, value).click()
 
 # Change the quantity to 2 and update cart in Cart Page
+qty = 2
 value = '//div[@class="quantity"]/input' 
 s.find_element(By.XPATH, value).clear()
-s.find_element(By.XPATH, value).send_keys("2")
+s.find_element(By.XPATH, value).send_keys(qty)
 
 value = '//button[@name="update_cart"]'
 s.find_element(By.XPATH, value).click()
 
 # Verify that Subtotal is $30.00
+# 因為按了update cart，如果直接去判斷價格會出現問題，
+# 時間太短了，但為了必免使用wait方式，所以這觀察了一下
+# 我們可以等到update cart的alert消失後，再去判斷，
+# 因此我們可以判斷 Proceed to checkout是否可以按
+# 但在寫W4P1作業的時候，發現了比較好的方式，之後可以參考find_element_unclickable
 value = '//div[@class="cart_totals"]/div/a'
 s.check_element_click(By.XPATH, value)
 
 value='//td[@data-title="Subtotal"]'
 subtotal = s.find_element(By.XPATH, value).text
+value='//a[text()="Album"]/ancestor::tr/descendant::span[contains(@class, "amount")]/bdi'
+prod_price = s.find_element(By.XPATH, value).text
+expect_subtotal = float(prod_price[1:]) * qty
+
 # print(subtotal)
-if subtotal != '$30.00':
+if float(subtotal[1:]) != expect_subtotal:
      print('Subtotal is failed')
 else:
      print('success')
@@ -92,8 +102,8 @@ s.find_element(By.XPATH, value).send_keys('abc@abc.com')
 value = '//*[@id="createaccount"]'
 s.find_element(By.XPATH, value).click()
 
-value ='//*[@id="account_password"]'
-s.find_element(By.XPATH, value).send_keys('abc@abc.com')
+value = 'account_password'
+s.check_element_click(By.ID, value).send_keys('1234QWERasdf!@#$')
 
 # Fill in Additional Information with “Thank you!” in Checkout Page
 value ='//*[@id="order_comments"]'
